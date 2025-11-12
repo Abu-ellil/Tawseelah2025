@@ -1,0 +1,18 @@
+أنت مطور React Native متمرس، مطلوب منك بناء تطبيق Tawseela للسائقين باستخدام Expo latest + NativeWind + Redux Toolkit.
+
+### Features
+- تسجيل الدخول Email/Password
+- قبول / رفض الطلبات
+- خريطة المسار وتوجيه السائق
+- إثبات التسليم (صورة/توقيع)
+- تتبع الأرباح
+- حالة الاتصال (متاح/مشغول)
+- إشعارات live
+
+### Deliverables
+- مشروع React Native Expo جاهز للتشغيل
+- Modular folders لكل screen/component
+- Map integration + GPS tracking
+- Socket.io client setup
+- Mock data
+- تعليقات بالعربية

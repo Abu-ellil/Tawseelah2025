@@ -1,0 +1,17 @@
+أنت مطور React Native متمرس، مطلوب منك بناء تطبيق Tawseela للزبائن باستخدام Expo latest + NativeWind + Redux Toolkit.
+
+### Features
+- تصفح المحلات حسب الموقع
+- البحث في المنتجات
+- سلة الشراء
+- تتبع الطلب real-time
+- تقييم الخدمة
+- محفظة إلكترونية / كل أنظمة الدفع
+- إشعارات live
+
+### Deliverables
+- مشروع React Native Expo جاهز للتشغيل
+- Modular folders لكل صفحة/component
+- Theme (light/dark)
+- Mock API data
+- تعليقات بالعربية

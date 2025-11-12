@@ -1,0 +1,97 @@
+
+
+
+##############################
+# Customer App Prompt
+##############################
+أنت مطور React Native متمرس، مطلوب منك بناء تطبيق Tawseela للزبائن باستخدام Expo latest + NativeWind + Redux Toolkit.
+
+### Features
+- تصفح المحلات حسب الموقع
+- البحث في المنتجات
+- سلة الشراء
+- تتبع الطلب real-time
+- تقييم الخدمة
+- محفظة إلكترونية / كل أنظمة الدفع
+- إشعارات live
+
+### Deliverables
+- مشروع React Native Expo جاهز للتشغيل
+- Modular folders لكل صفحة/component
+- Theme (light/dark)
+- Mock API data
+- تعليقات بالعربية
+
+##############################
+# Driver App Prompt
+##############################
+أنت مطور React Native متمرس، مطلوب منك بناء تطبيق Tawseela للسائقين باستخدام Expo latest + NativeWind + Redux Toolkit.
+
+### Features
+- تسجيل الدخول Email/Password
+- قبول / رفض الطلبات
+- خريطة المسار وتوجيه السائق
+- إثبات التسليم (صورة/توقيع)
+- تتبع الأرباح
+- حالة الاتصال (متاح/مشغول)
+- إشعارات live
+
+### Deliverables
+- مشروع React Native Expo جاهز للتشغيل
+- Modular folders لكل screen/component
+- Map integration + GPS tracking
+- Socket.io client setup
+- Mock data
+- تعليقات بالعربية
+
+##############################
+# Store Owner App Prompt
+##############################
+أنت مطور React Native متمرس، مطلوب منك بناء تطبيق Tawseela لأصحاب المتاجر باستخدام Expo latest + NativeWind + Redux Toolkit.
+
+### Features
+- إدارة المنتجات والمخزون
+- استقبال الطلبات وتأكيدها
+- إحصائيات المبيعات
+- إدارة ساعات العمل
+- تقارير مالية
+- إشعارات live
+
+### Deliverables
+- مشروع React Native Expo جاهز للتشغيل
+- Modular folders لكل screen/component
+- Mock data جاهز
+- تعليقات بالعربية
+
+##############################
+# Admin Dashboard Prompt
+##############################
+أنت مطور React متمرس، مطلوب منك بناء لوحة تحكم الأدمن لـ Tawseela باستخدام React latest + NativeWind + Redux Toolkit.
+
+### Features
+- مراجعة طلبات السائقين
+- مراقبة الطلبات الحية
+- إدارة المناطق الجغرافية
+- إدارة العمولة والأسعار
+- تقارير شاملة
+- إشعارات live
+
+### Deliverables
+- مشروع React Web جاهز للتشغيل
+- Modular folders لكل صفحة/component
+- Mock data جاهز
+- Dashboard charts جاهزة
+- تعليقات بالعربية
+
+##############################
+# Instructions for AI Agent
+##############################
+1. Generate all projects as described above using Expo latest وReact latest.
+2. Include Redux Toolkit setup for state management.
+3. Use NativeWind for styling + RTL + Light/Dark theme.
+4. API integration placeholders to connect with Tawseela Backend.
+5. Include Mock data for testing.
+6. Add Socket.io-client for real-time updates.
+7. Add comments in Arabic inside code for clarity.
+8. Organize projects modularly, each screen/component separate folder.
+9. Package each app folder ready to run via npm install + npm start.
