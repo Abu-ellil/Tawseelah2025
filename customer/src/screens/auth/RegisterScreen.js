@@ -1,82 +1,101 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useSelector, useDispatch } from 'react-redux';
-import { loginSuccess } from '../../store/slices/authSlice';
-import { useTheme } from '../../theme/ThemeContext';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  Alert,
+  Image,
+} from "react-native";
+import { useRouter } from "expo-router";
+import { useSelector, useDispatch } from "react-redux";
+import { loginSuccess } from "../../store/slices/authSlice";
+import { useTheme } from "../../theme/ThemeContext";
 
 // Mock data
-import { mockRegister } from '../../utils/mockData';
+import { mockRegister } from "../../utils/mockData";
 
 const RegisterScreen = () => {
-  const navigation = useNavigation();
+  const router = useRouter();
   const { colors } = useTheme();
   const dispatch = useDispatch();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleRegister = async () => {
     if (!name || !email || !phone || !password || !confirmPassword) {
-      Alert.alert('خطأ', 'الرجاء ملء جميع الحقول');
+      Alert.alert("خطأ", "الرجاء ملء جميع الحقول");
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('خطأ', 'كلمة المرور غير مطابقة');
+      Alert.alert("خطأ", "كلمة المرور غير مطابقة");
       return;
     }
 
     if (password.length < 6) {
-      Alert.alert('خطأ', 'كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      Alert.alert("خطأ", "كلمة المرور يجب أن تكون 6 أحرف على الأقل");
       return;
     }
 
     try {
       // في تطبيق حقيقي، سيتم استدعاء API لتسجيل المستخدم
       const response = await mockRegister({ name, email, phone, password });
-      
+
       if (response.success) {
         // تسجيل الدخول التلقائي بعد التسجيل
-        dispatch(loginSuccess({
-          user: response.user,
-          token: response.token
-        }));
-        
+        dispatch(
+          loginSuccess({
+            user: response.user,
+            token: response.token,
+          })
+        );
+
         // الانتقال إلى الشاشة الرئيسية
-        navigation.replace('Main');
+        router.replace("/home");
       } else {
-        Alert.alert('خطأ', response.message);
+        Alert.alert("خطأ", response.message);
       }
     } catch (err) {
-      Alert.alert('خطأ', 'حدث خطأ أثناء محاولة إنشاء الحساب');
+      Alert.alert("خطأ", "حدث خطأ أثناء محاولة إنشاء الحساب");
     }
   };
 
   return (
-    <View className="flex-1 justify-center px-6" style={{ backgroundColor: colors.background }}>
+    <View
+      className="flex-1 justify-center px-6"
+      style={{ backgroundColor: colors.background }}
+    >
       {/* شعار التطبيق */}
       <View className="items-center mb-6">
-        <Image 
-          source={require('../../../assets/logo.png')} 
+        <Image
+          source={require("../../../assets/logo.png")}
           className="w-20 h-20 rounded-full mb-2"
         />
-        <Text className="text-2xl font-bold" style={{ color: colors.primary }}>توصيلة</Text>
+        <Text className="text-2xl font-bold" style={{ color: colors.primary }}>
+          توصيلة
+        </Text>
         <Text style={{ color: colors.placeholder }}>إنشاء حساب جديد</Text>
       </View>
 
       {/* نموذج التسجيل */}
       <View>
-        <Text className="text-lg font-medium mb-2" style={{ color: colors.text }}>الاسم الكامل</Text>
+        <Text
+          className="text-lg font-medium mb-2"
+          style={{ color: colors.text }}
+        >
+          الاسم الكامل
+        </Text>
         <TextInput
           className="p-4 rounded-xl mb-4 border"
-          style={{ 
+          style={{
             backgroundColor: colors.card,
             borderColor: colors.border,
-            color: colors.text
+            color: colors.text,
           }}
           placeholder="أدخل اسمك الكامل"
           placeholderTextColor={colors.placeholder}
@@ -84,13 +103,18 @@ const RegisterScreen = () => {
           onChangeText={setName}
         />
 
-        <Text className="text-lg font-medium mb-2" style={{ color: colors.text }}>البريد الإلكتروني</Text>
+        <Text
+          className="text-lg font-medium mb-2"
+          style={{ color: colors.text }}
+        >
+          البريد الإلكتروني
+        </Text>
         <TextInput
           className="p-4 rounded-xl mb-4 border"
-          style={{ 
+          style={{
             backgroundColor: colors.card,
             borderColor: colors.border,
-            color: colors.text
+            color: colors.text,
           }}
           placeholder="أدخل بريدك الإلكتروني"
           placeholderTextColor={colors.placeholder}
@@ -100,13 +124,18 @@ const RegisterScreen = () => {
           autoCapitalize="none"
         />
 
-        <Text className="text-lg font-medium mb-2" style={{ color: colors.text }}>رقم الهاتف</Text>
+        <Text
+          className="text-lg font-medium mb-2"
+          style={{ color: colors.text }}
+        >
+          رقم الهاتف
+        </Text>
         <TextInput
           className="p-4 rounded-xl mb-4 border"
-          style={{ 
+          style={{
             backgroundColor: colors.card,
             borderColor: colors.border,
-            color: colors.text
+            color: colors.text,
           }}
           placeholder="أدخل رقم هاتفك"
           placeholderTextColor={colors.placeholder}
@@ -115,13 +144,18 @@ const RegisterScreen = () => {
           keyboardType="phone-pad"
         />
 
-        <Text className="text-lg font-medium mb-2" style={{ color: colors.text }}>كلمة المرور</Text>
+        <Text
+          className="text-lg font-medium mb-2"
+          style={{ color: colors.text }}
+        >
+          كلمة المرور
+        </Text>
         <TextInput
           className="p-4 rounded-xl mb-4 border"
-          style={{ 
+          style={{
             backgroundColor: colors.card,
             borderColor: colors.border,
-            color: colors.text
+            color: colors.text,
           }}
           placeholder="أدخل كلمة المرور"
           placeholderTextColor={colors.placeholder}
@@ -130,13 +164,18 @@ const RegisterScreen = () => {
           secureTextEntry
         />
 
-        <Text className="text-lg font-medium mb-2" style={{ color: colors.text }}>تأكيد كلمة المرور</Text>
+        <Text
+          className="text-lg font-medium mb-2"
+          style={{ color: colors.text }}
+        >
+          تأكيد كلمة المرور
+        </Text>
         <TextInput
           className="p-4 rounded-xl mb-6 border"
-          style={{ 
+          style={{
             backgroundColor: colors.card,
             borderColor: colors.border,
-            color: colors.text
+            color: colors.text,
           }}
           placeholder="أعد إدخال كلمة المرور"
           placeholderTextColor={colors.placeholder}
@@ -145,7 +184,7 @@ const RegisterScreen = () => {
           secureTextEntry
         />
 
-        <TouchableOpacity 
+        <TouchableOpacity
           className="w-full py-4 rounded-xl items-center mb-4"
           style={{ backgroundColor: colors.primary }}
           onPress={handleRegister}
@@ -153,10 +192,10 @@ const RegisterScreen = () => {
           <Text className="text-white font-bold text-lg">إنشاء الحساب</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity 
+        <TouchableOpacity
           className="w-full py-3 rounded-xl items-center border"
           style={{ borderColor: colors.primary, borderWidth: 1 }}
-          onPress={() => navigation.goBack()}
+          onPress={() => router.back()}
         >
           <Text className="text-primary font-bold">تسجيل الدخول</Text>
         </TouchableOpacity>
@@ -164,7 +203,7 @@ const RegisterScreen = () => {
 
       {/* شروط الخدمة */}
       <View className="mt-6 items-center">
-        <Text style={{ color: colors.placeholder, textAlign: 'center' }}>
+        <Text style={{ color: colors.placeholder, textAlign: "center" }}>
           بالتسجيل، أنت توافق على شروط الخدمة وسياسة الخصوصية
         </Text>
       </View>
