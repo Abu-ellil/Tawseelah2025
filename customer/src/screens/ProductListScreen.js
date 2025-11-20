@@ -4,19 +4,21 @@ import {
   Text,
   FlatList,
   TouchableOpacity,
-  Image,
   ScrollView,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../theme/ThemeContext";
 import {
   fetchProductsStart,
   fetchProductsSuccess,
 } from "../store/slices/productSlice";
+import ProductCard from "../components/ProductCard";
 import { mockProducts } from "../utils/mockData";
 
 const ProductListScreen = () => {
   const { colors } = useTheme();
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const { filteredProducts } = useSelector((state) => state.products);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -44,31 +46,21 @@ const ProductListScreen = () => {
         );
 
   const renderProduct = ({ item }) => (
-    <TouchableOpacity
-      className="flex-row p-4 mb-3 rounded-xl"
-      style={{ backgroundColor: colors.card }}
-    >
-      <Image
-        source={{ uri: item.image || "https://via.placeholder.com/100" }}
-        className="w-16 h-16 rounded-lg"
-      />
-      <View className="flex-1 mr-3">
-        <Text className="text-base font-medium" style={{ color: colors.text }}>
-          {item.name}
-        </Text>
-        <Text className="text-sm" style={{ color: colors.placeholder }}>
-          {item.category}
-        </Text>
-        <View className="flex-row justify-between items-center mt-1">
-          <Text className="text-lg font-bold" style={{ color: colors.primary }}>
-            {item.price} ر.س
-          </Text>
-          <Text className="text-xs" style={{ color: colors.placeholder }}>
-            {item.rating} ⭐
-          </Text>
-        </View>
-      </View>
-    </TouchableOpacity>
+    <ProductCard
+      product={item}
+      onPress={() => {
+        // عند النقر على المنتج، الانتقال لصفحة المتجر
+        navigation.navigate("store-details", {
+          storeId: item.store,
+          scrollToProduct: item._id,
+        });
+      }}
+      showAddToCart={true}
+      showWishlist={true}
+      showRating={true}
+      showStore={true}
+      style={{ width: '48%' }} // للشبكة الثنائية
+    />
   );
 
   return (
@@ -126,13 +118,26 @@ const ProductListScreen = () => {
           {selectedCategory === "all" ? "جميع المنتجات" : selectedCategory}
         </Text>
 
-        <FlatList
-          data={filteredByCategory}
-          renderItem={renderProduct}
-          keyExtractor={(item) => item._id}
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={false}
-        />
+        <View className="flex-row flex-wrap justify-between">
+          {filteredByCategory.map((item) => (
+            <View key={item._id} style={{ width: '48%', marginBottom: 10 }}>
+              <ProductCard
+                product={item}
+                onPress={() => {
+                  // عند النقر على المنتج، الانتقال لصفحة المتجر
+                  navigation.navigate("store-details", {
+                    storeId: item.store,
+                    scrollToProduct: item._id,
+                  });
+                }}
+                showAddToCart={true}
+                showWishlist={true}
+                showRating={true}
+                showStore={false}
+              />
+            </View>
+          ))}
+        </View>
       </View>
     </ScrollView>
   );

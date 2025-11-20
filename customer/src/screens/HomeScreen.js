@@ -18,6 +18,7 @@ import {
   fetchProductsSuccess,
 } from "../store/slices/productSlice";
 import { useTheme } from "../theme/ThemeContext";
+import ProductCard from "../components/ProductCard";
 
 // Mock data
 import { mockStores, mockProducts } from "../utils/mockData";
@@ -61,43 +62,22 @@ const HomeScreen = () => {
     </TouchableOpacity>
   );
 
-  // عرض المنتجات المميزة
+  // عرض المنتجات المميزة باستخدام ProductCard الجديد
   const renderProduct = ({ item }) => (
-    <TouchableOpacity
-      className="w-32 h-40 mx-2 rounded-lg overflow-hidden shadow-md"
-      style={{ backgroundColor: colors.card }}
+    <ProductCard
+      product={item}
       onPress={() => {
-        // عند النقر على المنتج، إضافته إلى السلة أو عرض تفاصيله
+        // عند النقر على المنتج، الانتقال لصفحة المتجر
         navigation.navigate("store-details", {
           storeId: item.store,
           scrollToProduct: item._id,
         });
       }}
-    >
-      <Image
-        source={{ uri: item.image || "https://via.placeholder.com/100" }}
-        className="w-full h-20 object-cover"
-      />
-      <View className="p-2">
-        <Text
-          className="text-sm font-medium"
-          style={{ color: colors.text }}
-          numberOfLines={1}
-        >
-          {item.name}
-        </Text>
-        <Text
-          className="text-xs"
-          style={{ color: colors.placeholder }}
-          numberOfLines={1}
-        >
-          {item.category}
-        </Text>
-        <Text className="text-sm font-bold" style={{ color: colors.primary }}>
-          {item.price} ر.س
-        </Text>
-      </View>
-    </TouchableOpacity>
+      showAddToCart={true}
+      showWishlist={true}
+      showRating={true}
+      showStore={false}
+    />
   );
 
   return (

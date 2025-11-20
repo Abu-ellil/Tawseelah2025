@@ -3,7 +3,9 @@
  * @description إعداد Socket.io للتعقب في الوقت الفعلي والإشعارات
  */
 
-const User = require('../models/User');
+const Customer = require('../models/Customer');
+const Driver = require('../models/Driver');
+const StoreOwner = require('../models/StoreOwner');
 const Order = require('../models/Order');
 const Notification = require('../models/Notification');
 const logger = require('../utils/logger');
@@ -16,13 +18,13 @@ module.exports = (socketIoInstance) => {
   io.on('connection', (socket) => {
     logger.info(`User connected: ${socket.id}`);
 
-    // انضمام المستخدم إلى غرفة بناءً على معرفه
-    socket.on('join_user_room', async (userId) => {
+    // انضمام العميل إلى غرفة بناءً على معرفه
+    socket.on('join_customer_room', async (customerId) => {
       try {
-        socket.join(`user_${userId}`);
-        logger.info(`User ${userId} joined room user_${userId}`);
+        socket.join(`customer_${customerId}`);
+        logger.info(`Customer ${customerId} joined room customer_${customerId}`);
       } catch (error) {
-        logger.error(`Error joining user room: ${error.message}`);
+        logger.error(`Error joining customer room: ${error.message}`);
       }
     });
 
@@ -33,6 +35,16 @@ module.exports = (socketIoInstance) => {
         logger.info(`Driver ${driverId} joined room driver_${driverId}`);
       } catch (error) {
         logger.error(`Error joining driver room: ${error.message}`);
+      }
+    });
+
+    // انضمام مالك المتجر إلى غرفة بناءً على معرفه
+    socket.on('join_store_owner_room', async (storeOwnerId) => {
+      try {
+        socket.join(`store_owner_${storeOwnerId}`);
+        logger.info(`Store owner ${storeOwnerId} joined room store_owner_${storeOwnerId}`);
+      } catch (error) {
+        logger.error(`Error joining store owner room: ${error.message}`);
       }
     });
 
@@ -52,9 +64,9 @@ module.exports = (socketIoInstance) => {
         const { driverId, location, orderId } = data;
 
         // التحقق من أن السائق موجود
-        const driver = await User.findById(driverId);
-        if (!driver || driver.role !== 'driver') {
-          logger.error(`Driver ${driverId} not found or invalid role`);
+        const driver = await Driver.findById(driverId);
+        if (!driver) {
+          logger.error(`Driver ${driverId} not found`);
           return;
         }
 
@@ -77,7 +89,7 @@ module.exports = (socketIoInstance) => {
           // إرسال التحديث إلى غرفة العميل
           const order = await Order.findById(orderId).populate('customer');
           if (order && order.customer) {
-            io.to(`user_${order.customer._id}`).emit('driver_location_update', {
+            io.to(`customer_${order.customer._id}`).emit('driver_location_update', {
               driverId,
               location,
               orderId,
@@ -128,7 +140,7 @@ module.exports = (socketIoInstance) => {
 
         // إرسال التحديث إلى غرفة العميل
         if (order.customer) {
-          io.to(`user_${order.customer}`).emit('order_status_update', {
+          io.to(`customer_${order.customer}`).emit('order_status_update', {
             orderId,
             status,
             driverId,
@@ -136,9 +148,9 @@ module.exports = (socketIoInstance) => {
           });
         }
 
-        // إرسال التحديث إلى غرفة المتجر
-        if (order.store) {
-          io.to(`user_${order.store.owner}`).emit('order_status_update', {
+        // إرسال التحديث إلى غرفة مالك المتجر
+        if (order.store && order.store.owner) {
+          io.to(`store_owner_${order.store.owner}`).emit('order_status_update', {
             orderId,
             status,
             driverId,
@@ -165,7 +177,7 @@ module.exports = (socketIoInstance) => {
     // إنشاء إشعار جديد
     socket.on('create_notification', async (data) => {
       try {
-        const { userId, type, title, message, orderId } = data;
+        const { userId, type, title, message, orderId, userType } = data;
 
         // إنشاء الإشعار في قاعدة البيانات
         const notification = await Notification.create({
@@ -176,13 +188,28 @@ module.exports = (socketIoInstance) => {
           data: { orderId }
         });
 
-        // إرسال الإشعار إلى المستخدم
-        io.to(`user_${userId}`).emit('new_notification', {
+        // إرسال الإشعار إلى المستخدم بناءً على نوعه
+        let roomName = '';
+        switch(userType) {
+          case 'customer':
+            roomName = `customer_${userId}`;
+            break;
+          case 'driver':
+            roomName = `driver_${userId}`;
+            break;
+          case 'store_owner':
+            roomName = `store_owner_${userId}`;
+            break;
+          default:
+            roomName = `customer_${userId}`; // افتراضي
+        }
+
+        io.to(roomName).emit('new_notification', {
           notification,
           timestamp: new Date()
         });
 
-        logger.info(`Notification created for user ${userId}: ${message}`);
+        logger.info(`Notification created for ${userType} ${userId}: ${message}`);
       } catch (error) {
         logger.error(`Error creating notification: ${error.message}`);
       }
@@ -215,7 +242,7 @@ function startCronJobs() {
 
       for (const order of orders) {
         // إرسال إشعار للعميل بأن التسليم متأخر
-        io.to(`user_${order.customer}`).emit('delivery_delayed', {
+        io.to(`customer_${order.customer}`).emit('delivery_delayed', {
           orderId: order._id,
           message: 'Delivery is taking longer than expected',
           timestamp: new Date()

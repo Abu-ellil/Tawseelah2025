@@ -14,7 +14,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 // استيراد الملفات الخاصة بالمشروع
-const connectDB = require('./config/db');
+const connectDB = require('./config/db'); 
 const logger = require('./utils/logger');
 const errorHandler = require('./middleware/errorHandler');
 

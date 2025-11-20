@@ -1,36 +1,35 @@
 /**
- * @file driverController.js - Driver Controller for Tawseela Backend
- * @description وحدة التحكم الخاصة بتسجيل وتسجيل دخول السائقين
+ * @file customerController.js - Customer Controller for Tawseela Backend
+ * @description وحدة التحكم الخاصة بتسجيل وتسجيل دخول العملاء
  */
 
-const Driver = require('../../models/Driver');
+const Customer = require('../../models/Customer');
 const asyncHandler = require('../../middleware/async');
 const ErrorResponse = require('../../utils/errorResponse');
 const sendEmail = require('../../utils/sendEmail');
 const crypto = require('crypto');
 
-// @desc    Register driver
-// @route   POST /api/drivers/register
+// @desc    Register customer
+// @route   POST /api/customers/register
 // @access  Public
-exports.registerDriver = asyncHandler(async (req, res, next) => {
-  const { name, email, password, phone, vehicle } = req.body;
+exports.registerCustomer = asyncHandler(async (req, res, next) => {
+  const { name, email, password, phone } = req.body;
 
-  // إنشاء السائق
-  const driver = await Driver.create({
+  // إنشاء العميل
+  const customer = await Customer.create({
     name,
     email,
     password,
-    phone,
-    vehicle
+    phone
   });
 
   // إنشاء التوكن
-  const token = driver.getSignedJwtToken();
+  const token = customer.getSignedJwtToken();
 
   // إعداد خيارات الكوكيز
   const options = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production' // إذا كان في الإنتاج، قم بتعيين secure إلى true
@@ -42,57 +41,55 @@ exports.registerDriver = asyncHandler(async (req, res, next) => {
   }
 
   // إرسال الاستجابة مع الكوكيز
-  res
+ res
     .status(200)
     .cookie('token', token, options)
     .json({
       success: true,
       token,
       data: {
-        id: driver._id,
-        name: driver.name,
-        email: driver.email,
-        phone: driver.phone,
-        isVerified: driver.isVerified,
-        isOnline: driver.isOnline,
-        wallet: driver.wallet,
-        vehicle: driver.vehicle
+        id: customer._id,
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        isVerified: customer.isVerified,
+        wallet: customer.wallet
       }
     });
 });
 
-// @desc    Login driver
-// @route   POST /api/drivers/login
+// @desc    Login customer
+// @route   POST /api/customers/login
 // @access  Public
-exports.loginDriver = asyncHandler(async (req, res, next) => {
+exports.loginCustomer = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
   // التحقق من البريد الإلكتروني وكلمة المرور
   if (!email || !password) {
-    return next(new ErrorResponse('الرجاء إدخال البريد الإلكتروني وكلمة المرور', 400));
+    return next(new ErrorResponse('الرجاء إدخال البريد الإلكتروني وكلمة المرور', 40));
   }
 
-  // العثور على السائق
-  const driver = await Driver.findOne({ email }).select('+password');
+ // العثور على العميل
+  const customer = await Customer.findOne({ email }).select('+password');
 
-  if (!driver) {
+  if (!customer) {
     return next(new ErrorResponse('بيانات الاعتماد غير صحيحة', 401));
   }
 
   // التحقق من كلمة المرور
-  const isMatch = await driver.matchPassword(password);
+  const isMatch = await customer.matchPassword(password);
 
   if (!isMatch) {
     return next(new ErrorResponse('بيانات الاعتماد غير صحيحة', 401));
   }
 
   // إنشاء التوكن
-  const token = driver.getSignedJwtToken();
+  const token = customer.getSignedJwtToken();
 
   // إعداد خيارات الكوكيز
   const options = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production'
@@ -103,8 +100,8 @@ exports.loginDriver = asyncHandler(async (req, res, next) => {
     delete options.secure;
   }
 
-  // حذف الحقل المحدد من السائق قبل الإرسال
-  driver.password = undefined;
+  // حذف الحقل المحدد من العميل قبل الإرسال
+  customer.password = undefined;
 
   // إرسال الاستجابة
   res
@@ -114,52 +111,45 @@ exports.loginDriver = asyncHandler(async (req, res, next) => {
       success: true,
       token,
       data: {
-        id: driver._id,
-        name: driver.name,
-        email: driver.email,
-        phone: driver.phone,
-        isVerified: driver.isVerified,
-        isOnline: driver.isOnline,
-        wallet: driver.wallet,
-        vehicle: driver.vehicle
+        id: customer._id,
+        name: customer.name,
+        email: customer.email,
+        phone: customer.phone,
+        isVerified: customer.isVerified,
+        wallet: customer.wallet
       }
     });
 });
 
-// @desc    Get current logged in driver
-// @route   GET /api/drivers/me
+// @desc    Get current logged in customer
+// @route   GET /api/customers/me
 // @access  Private
 exports.getMe = asyncHandler(async (req, res, next) => {
-  const driver = await Driver.findById(req.driver.id);
+  const customer = await Customer.findById(req.customer.id);
 
   res.status(200).json({
     success: true,
     data: {
-      id: driver._id,
-      name: driver.name,
-      email: driver.email,
-      phone: driver.phone,
-      isVerified: driver.isVerified,
-      isOnline: driver.isOnline,
-      wallet: driver.wallet,
-      location: driver.location,
-      vehicle: driver.vehicle,
-      rating: driver.rating,
-      totalDeliveries: driver.totalDeliveries
+      id: customer._id,
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone,
+      isVerified: customer.isVerified,
+      wallet: customer.wallet,
+      location: customer.location,
+      defaultAddress: customer.defaultAddress
     }
   });
 });
 
-// @desc    Update driver details
-// @route   PUT /api/drivers/me
+// @desc    Update customer details
+// @route   PUT /api/customers/me
 // @access  Private
 exports.updateDetails = asyncHandler(async (req, res, next) => {
   const fieldsToUpdate = {
     name: req.body.name,
     email: req.body.email,
-    phone: req.body.phone,
-    vehicle: req.body.vehicle,
-    location: req.body.location
+    phone: req.body.phone
   };
 
   // تجاهل الحقول الفارغة
@@ -169,37 +159,37 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
     }
   });
 
-  const driver = await Driver.findByIdAndUpdate(req.driver.id, fieldsToUpdate, {
+  const customer = await Customer.findByIdAndUpdate(req.customer.id, fieldsToUpdate, {
     new: true,
     runValidators: true
   });
 
   res.status(200).json({
     success: true,
-    data: driver
+    data: customer
   });
 });
 
-// @desc    Update driver password
-// @route   PUT /api/drivers/me/password
+// @desc    Update customer password
+// @route   PUT /api/customers/me/password
 // @access  Private
 exports.updatePassword = asyncHandler(async (req, res, next) => {
-  const driver = await Driver.findById(req.driver.id).select('+password');
+  const customer = await Customer.findById(req.customer.id).select('+password');
 
   // التحقق من كلمة المرور الحالية
-  if (!(await driver.matchPassword(req.body.currentPassword))) {
+  if (!(await customer.matchPassword(req.body.currentPassword))) {
     return next(new ErrorResponse('كلمة المرور غير صحيحة', 401));
   }
 
-  driver.password = req.body.newPassword;
-  await driver.save();
+  customer.password = req.body.newPassword;
+  await customer.save();
 
-  const token = driver.getSignedJwtToken();
+  const token = customer.getSignedJwtToken();
 
   // إعداد خيارات الكوكيز
   const options = {
     expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 1000
+      Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 60 * 1000
     ),
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production'
@@ -219,81 +209,28 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
     });
 });
 
-// @desc    Upload driver documents for verification
-// @route   PUT /api/drivers/me/documents
-// @access  Private
-exports.uploadDocuments = asyncHandler(async (req, res, next) => {
-  const { nationalId, license, photo } = req.body;
-
-  const driver = await Driver.findByIdAndUpdate(
-    req.driver.id,
-    {
-      $set: {
-        'documents.nationalId': nationalId,
-        'documents.license': license,
-        'documents.photo': photo,
-        'documents.status': 'pending'
-      }
-    },
-    {
-      new: true,
-      runValidators: true
-    }
-  );
-
-  res.status(200).json({
-    success: true,
-    data: {
-      documents: driver.documents
-    }
- });
-});
-
-// @desc    Update driver online status
-// @route   PUT /api/drivers/me/online
-// @access  Private
-exports.updateOnlineStatus = asyncHandler(async (req, res, next) => {
- const { isOnline } = req.body;
-
-  const driver = await Driver.findByIdAndUpdate(
-    req.driver.id,
-    { isOnline },
-    {
-      new: true,
-      runValidators: true
-    }
-  );
-
-  res.status(200).json({
-    success: true,
-    data: {
-      isOnline: driver.isOnline
-    }
-  });
-});
-
 // @desc    Forgot password
-// @route   POST /api/drivers/forgotpassword
+// @route   POST /api/customers/forgotpassword
 // @access  Public
 exports.forgotPassword = asyncHandler(async (req, res, next) => {
-  const driver = await Driver.findOne({ email: req.body.email });
+  const customer = await Customer.findOne({ email: req.body.email });
 
-  if (!driver) {
-    return next(new ErrorResponse('لا يوجد سائق بهذا البريد الإلكتروني', 404));
+  if (!customer) {
+    return next(new ErrorResponse('لا يوجد عميل بهذا البريد الإلكتروني', 404));
   }
 
   // توليد رمز إعادة تعيين كلمة المرور
- const resetToken = driver.getResetPasswordToken();
-  await driver.save({ validateBeforeSave: false });
+  const resetToken = customer.getResetPasswordToken();
+  await customer.save({ validateBeforeSave: false });
 
   // إنشاء رابط إعادة التعيين
-  const resetUrl = `${req.protocol}://${req.get('host')}/api/drivers/resetpassword/${resetToken}`;
+  const resetUrl = `${req.protocol}://${req.get('host')}/api/customers/resetpassword/${resetToken}`;
 
   const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
 
   try {
     await sendEmail({
-      email: driver.email,
+      email: customer.email,
       subject: 'Password reset token',
       message
     });
@@ -301,17 +238,17 @@ exports.forgotPassword = asyncHandler(async (req, res, next) => {
     res.status(20).json({ success: true, data: 'Token sent to email' });
   } catch (err) {
     console.log(err);
-    driver.resetPasswordToken = undefined;
-    driver.resetPasswordExpire = undefined;
+    customer.resetPasswordToken = undefined;
+    customer.resetPasswordExpire = undefined;
 
-    await driver.save({ validateBeforeSave: false });
+    await customer.save({ validateBeforeSave: false });
 
     return next(new ErrorResponse('حدث خطأ أثناء إرسال البريد الإلكتروني', 500));
   }
 });
 
 // @desc    Reset password
-// @route   PUT /api/drivers/resetpassword/:resettoken
+// @route   PUT /api/customers/resetpassword/:resettoken
 // @access  Public
 exports.resetPassword = asyncHandler(async (req, res, next) => {
   // تشفير التوكن
@@ -320,29 +257,29 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
     .update(req.params.resettoken)
     .digest('hex');
 
-  // العثور على السائق باستخدام التوكن وتحقق من انتهاء الصلاحية
-  const driver = await Driver.findOne({
+  // العثور على العميل باستخدام التوكن وتحقق من انتهاء الصلاحية
+  const customer = await Customer.findOne({
     resetPasswordToken,
     resetPasswordExpire: { $gt: Date.now() }
   });
 
-  if (!driver) {
+  if (!customer) {
     return next(new ErrorResponse('التوكن غير صحيح أو منتهي الصلاحية', 400));
   }
 
   // تعيين كلمة المرور الجديدة
- driver.password = req.body.password;
+ customer.password = req.body.password;
 
   // تعيين الحقول إلى undefined
- driver.resetPasswordToken = undefined;
-  driver.resetPasswordExpire = undefined;
+  customer.resetPasswordToken = undefined;
+ customer.resetPasswordExpire = undefined;
 
- await driver.save();
+  await customer.save();
 
-  const token = driver.getSignedJwtToken();
+  const token = customer.getSignedJwtToken();
 
   // إعداد خيارات الكوكيز
-  const options = {
+ const options = {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRE * 24 * 60 * 1000
     ),
@@ -364,8 +301,8 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
     });
 });
 
-// @desc    Logout driver
-// @route   GET /api/drivers/logout
+// @desc    Logout customer
+// @route   GET /api/customers/logout
 // @access  Private
 exports.logout = asyncHandler(async (req, res, next) => {
   res.cookie('token', 'none', {
@@ -376,5 +313,5 @@ exports.logout = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: {}
-  });
+ });
 });

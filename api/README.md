@@ -22,6 +22,8 @@
 - `modules/payments`: نظام الدفع
 - `modules/notifications`: نظام الإشعارات
 - `modules/admin`: لوحة تحكم الأدمن
+- `modules/customers`: إدارة العملاء
+- `modules/storeowners`: إدارة ملاك المتاجر
 
 ## قواعد البيانات
 
@@ -44,6 +46,7 @@
    PORT=5000
    NODE_ENV=development
    CLIENT_URL=http://localhost:3000
+   JWT_COOKIE_EXPIRE=30
    PAYMOB_INTEGRATION_ID=your_paymob_integration_id
    PAYMOB_IFRAME_ID=your_paymob_iframe_id
    PAYMOB_API_KEY=your_paymob_api_key
@@ -59,11 +62,35 @@
 
 ## API Endpoints
 
-### المصادقة
-- `POST /api/auth/register` - تسجيل مستخدم جديد
-- `POST /api/auth/login` - تسجيل الدخول
-- `GET /api/auth/me` - الحصول على معلومات المستخدم الحالي
-- `PUT /api/auth/me` - تحديث معلومات المستخدم
+### تسجيل ودخول العملاء
+- `POST /api/customers/register` - تسجيل عميل جديد
+- `POST /api/customers/login` - تسجيل دخول العميل
+- `GET /api/customers/me` - الحصول على معلومات العميل الحالي
+- `PUT /api/customers/me` - تحديث معلومات العميل
+- `PUT /api/customers/me/password` - تحديث كلمة مرور العميل
+- `POST /api/customers/forgotpassword` - استعادة كلمة المرور
+- `PUT /api/customers/resetpassword/:resettoken` - إعادة تعيين كلمة المرور
+
+### تسجيل ودخول السائقين
+- `POST /api/drivers/register` - تسجيل سائق جديد
+- `POST /api/drivers/login` - تسجيل دخول السائق
+- `GET /api/drivers/me` - الحصول على معلومات السائق الحالي
+- `PUT /api/drivers/me` - تحديث معلومات السائق
+- `PUT /api/drivers/me/password` - تحديث كلمة مرور السائق
+- `PUT /api/drivers/me/documents` - رفع وثائق التحقق
+- `PUT /api/drivers/me/online` - تحديث حالة توفر السائق
+- `POST /api/drivers/forgotpassword` - استعادة كلمة المرور
+- `PUT /api/drivers/resetpassword/:resettoken` - إعادة تعيين كلمة المرور
+
+### تسجيل ودخول ملاك المتاجر
+- `POST /api/store-owners/register` - تسجيل مالك متجر جديد
+- `POST /api/store-owners/login` - تسجيل دخول مالك المتجر
+- `GET /api/store-owners/me` - الحصول على معلومات مالك المتجر الحالي
+- `PUT /api/store-owners/me` - تحديث معلومات مالك المتجر
+- `PUT /api/store-owners/me/password` - تحديث كلمة مرور مالك المتجر
+- `PUT /api/store-owners/me/documents` - رفع وثائق التحقق
+- `POST /api/store-owners/forgotpassword` - استعادة كلمة المرور
+- `PUT /api/store-owners/resetpassword/:resettoken` - إعادة تعيين كلمة المرور
 
 ### المستخدمين
 - `GET /api/users` - الحصول على جميع المستخدمين (الأدمن فقط)
@@ -104,10 +131,7 @@
 - تتبع السائقين في الوقت الفعلي
 - إشعارات الطلبات
 - تحديثات الحالة الفورية
-
-## مخطط العلاقات بين الكيانات (ERD)
-
-مخطط العلاقات بين الكيانات متاح في ملف `docs/erd.json` و `docs/erd.png`.
+- دعم غرف منفصلة للعملاء، السائقين، وملاك المتاجر
 
 ## المتطلبات
 
@@ -119,7 +143,7 @@
 
 - دعم عدة قرى ومدن
 - نظام تحديد المواقع الجغرافي
-- تعقب الطلبات في الوقت الفعلي
+- تعقب الطلبات في الوقت الف realtime
 - دعم وسائل دفع متعددة
 
 ## الملفات
@@ -129,7 +153,10 @@
 - `middleware/auth.js` - مiddleware للمصادقة
 - `utils/logger.js` - وحدة تسجيل الأحداث
 - `docs/erd.json` - مخطط العلاقات بين الكيانات
-- `models/` - نماذج قاعدة البيانات
+- `models/Customer.js` - نموذج العميل
+- `models/Driver.js` - نموذج السائق
+- `models/StoreOwner.js` - نموذج مالك المتجر
+- `models/` - نماذج قاعدة البيانات الأخرى
 - `modules/` - وحدات النظام المعيارية
 
 ## المطور
