@@ -3,6 +3,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { Provider } from 'react-redux';
 import { store } from '../src/store';
 import { ThemeProvider } from '../src/theme/ThemeContext';
+import "../global.css"
+import 'nativewind';
 
 export default function RootLayout() {
   return (
