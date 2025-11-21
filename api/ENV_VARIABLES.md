@@ -104,32 +104,52 @@ PORT=5000
   - Default: `EGP`
   - Used in: [`api/modules/admin/controller.js`](api/modules/admin/controller.js:175)
 
+## Authentication Methods Supported
+
+The API supports multiple authentication methods:
+- **Email/Password** - Traditional authentication
+- **Phone/Password** - Phone-based authentication
+- **Social Login** - Google, Facebook, Apple (OAuth)
+- **JWT Tokens** - For session management
+
 ## Recommended .env Template
 
 ```env
-# Database
+# ============================================
+# DATABASE CONFIGURATION
+# ============================================
 MONGODB_URI=mongodb+srv://mrabuellil_db_user:mrabuellil_db_user@aifarm.j5pnubg.mongodb.net/elsoog?retryWrites=true&w=majority
 
-# Server
+# ============================================
+# SERVER CONFIGURATION
+# ============================================
 PORT=5000
 NODE_ENV=development
 
-# Client
+# ============================================
+# CLIENT/FRONTEND CONFIGURATION
+# ============================================
 CLIENT_URL=http://localhost:3000
 
-# JWT Authentication
+# ============================================
+# JWT AUTHENTICATION (REQUIRED)
+# ============================================
 JWT_SECRET=your_jwt_secret_key_here_change_in_production
 JWT_EXPIRE=30d
 JWT_COOKIE_EXPIRE=30
 
-# Email (SMTP)
+# ============================================
+# EMAIL CONFIGURATION (SMTP)
+# ============================================
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_EMAIL=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
 FROM_EMAIL=noreply@tawseela.com
 
-# Business Settings
+# ============================================
+# BUSINESS SETTINGS
+# ============================================
 COMMISSION_RATE=0.15
 DELIVERY_FEE=15
 CURRENCY=EGP

@@ -5,6 +5,7 @@
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 // تعريف مخطط السائق
 const driverSchema = new mongoose.Schema({
@@ -211,6 +212,30 @@ driverSchema.methods.matchPassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+// إنشاء JWT
+driverSchema.methods.getSignedJwtToken = function() {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE
+  });
+};
+
+// إنشاء رمز استعادة كلمة المرور
+driverSchema.methods.getResetPasswordToken = function() {
+  // توليد الرمز
+  const resetToken = crypto.randomBytes(20).toString('hex');
+
+  // تشفير الرمز وحفظه في قاعدة البيانات
+  this.resetPasswordToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  // تعيين وقت انتهاء الصلاحية (10 دقائق)
+  this.resetPasswordExpire = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
+};
+
 // طريقة لحساب التقييم المتوسط
 driverSchema.methods.calculateAverageRating = function() {
   if (this.reviews.length === 0) return 0;
@@ -226,5 +251,12 @@ driverSchema.pre('save', function(next) {
   }
   next();
 });
+
+// إنشاء JWT
+driverSchema.methods.getSignedJwtToken = function() {
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE
+  });
+};
 
 module.exports = mongoose.model('Driver', driverSchema);

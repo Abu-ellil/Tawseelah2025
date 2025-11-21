@@ -67,4 +67,8 @@ router.put('/resetpassword/:resettoken', [
 // @access  Public
 router.get('/verify/:verificationtoken', verifyEmail);
 
+// Include specific authentication routes
+const specificAuthRoutes = require('./specificAuthRoutes');
+router.use('/', specificAuthRoutes);
+
 module.exports = router;
